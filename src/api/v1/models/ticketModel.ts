@@ -2,7 +2,7 @@
  * Represents a support ticket in the system
  */
 export interface Ticket {
-  id: string;
+  id: number;
   title: string;
   description: string;
   priority: string;
