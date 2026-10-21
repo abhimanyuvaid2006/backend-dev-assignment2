@@ -21,6 +21,19 @@ const isValidPriority = (priority: string): boolean => {
   return false;
 };
 
+/**
+ * Checks if a status is one of the allowed values
+ * @param status - The status to check
+ * @returns true if the status is allowed, false if not
+ */
+const isValidStatus = (status: string): boolean => {
+  if (status === "open" || status === "in-progress" || status === "resolved") {
+    return true;
+  }
+
+  return false;
+};
+
 export const getAllTickets = async (
   req: Request,
   res: Response,
@@ -94,5 +107,53 @@ export const createTicket = async (
     }
   } catch (error) {
     next(error);
+  }
+};
+
+export const updateTicket = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const id: string = req.params.id as string;
+
+    // Extract update fields
+    const { title, description, priority, status } = req.body;
+
+    // A field is ok if it was not sent or if it has an allowed value
+    const priorityIsOk: boolean = !priority || isValidPriority(priority);
+    const statusIsOk: boolean = !status || isValidStatus(status);
+
+    if (!priorityIsOk) {
+      res.status(HTTP_STATUS.BAD_REQUEST).json({
+        message: "Invalid priority. Must be one of: critical, high, medium, low",
+      });
+    } else if (!statusIsOk) {
+      res.status(HTTP_STATUS.BAD_REQUEST).json({
+        message: "Invalid status. Must be one of: open, in-progress, resolved",
+      });
+    } else {
+      // Create update data object with only the fields that can be updated
+      const updateData: {
+        title?: string;
+        description?: string;
+        priority?: string;
+        status?: string;
+      } = { title, description, priority, status };
+
+      const updatedTicket: Ticket = await ticketService.updateTicket(
+        id,
+        updateData
+      );
+      res.status(HTTP_STATUS.OK).json({
+        message: "Ticket updated",
+        data: updatedTicket,
+      });
+    }
+  } catch (error) {
+    console.error("Error updating ticket:", error);
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+      message: "Ticket not found",
+    });
   }
 };
