@@ -16,8 +16,10 @@ export const getAllTickets = async (): Promise<Ticket[]> => {
  * @returns The matching ticket
  * @throws Error if ticket with given ID is not found
  */
-export const getTicketById = async (id: number): Promise<Ticket> => {
-  const index: number = tickets.findIndex((ticket: Ticket) => ticket.id === id);
+export const getTicketById = async (id: string): Promise<Ticket> => {
+  const index: number = tickets.findIndex(
+    (ticket: Ticket) => ticket.id.toString() === id
+  );
 
   if (index === -1) {
     throw new Error("Ticket not found");
@@ -58,7 +60,7 @@ export const createTicket = async (ticketData: {
  * @throws Error if ticket with given ID is not found
  */
 export const updateTicket = async (
-  id: number,
+  id: string,
   ticketData: {
     title?: string;
     description?: string;
@@ -66,7 +68,9 @@ export const updateTicket = async (
     status?: string;
   }
 ): Promise<Ticket> => {
-  const index: number = tickets.findIndex((ticket: Ticket) => ticket.id === id);
+  const index: number = tickets.findIndex(
+    (ticket: Ticket) => ticket.id.toString() === id
+  );
 
   if (index === -1) {
     throw new Error("Ticket not found");
@@ -77,10 +81,10 @@ export const updateTicket = async (
   // Only overwrite the fields that were actually provided
   tickets[index] = {
     ...existing,
-    title: ticketData.title ?? existing.title,
-    description: ticketData.description ?? existing.description,
-    priority: ticketData.priority ?? existing.priority,
-    status: ticketData.status ?? existing.status,
+    title: ticketData.title || existing.title,
+    description: ticketData.description || existing.description,
+    priority: ticketData.priority || existing.priority,
+    status: ticketData.status || existing.status,
   };
 
   return structuredClone(tickets[index]);
@@ -91,8 +95,10 @@ export const updateTicket = async (
  * @param id - The ID of the ticket to delete
  * @throws Error if ticket with given ID is not found
  */
-export const deleteTicket = async (id: number): Promise<void> => {
-  const index: number = tickets.findIndex((ticket: Ticket) => ticket.id === id);
+export const deleteTicket = async (id: string): Promise<void> => {
+  const index: number = tickets.findIndex(
+    (ticket: Ticket) => ticket.id.toString() === id
+  );
 
   if (index === -1) {
     throw new Error("Ticket not found");
