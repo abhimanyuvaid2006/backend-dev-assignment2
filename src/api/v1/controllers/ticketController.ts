@@ -157,3 +157,21 @@ export const updateTicket = async (
     });
   }
 };
+
+export const deleteTicket = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const id: string = req.params.id as string;
+    await ticketService.deleteTicket(id);
+    res.status(HTTP_STATUS.OK).json({
+      message: "Ticket deleted",
+    });
+  } catch (error) {
+    console.error("Error deleting ticket:", error);
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+      message: "Ticket not found",
+    });
+  }
+};
