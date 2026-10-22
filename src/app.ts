@@ -3,11 +3,8 @@ import express, { Express } from "express";
 import morgan from "morgan";
 import ticketRoutes from "./api/v1/routes/ticketRoutes";
 
-// initialize the express application
 const app: Express = express();
 
-// Interface for health check response
-// An interface in TypeScript defines the structure or "shape" of an object.
 interface HealthCheckResponse {
     status: string;
     uptime: number;
@@ -18,11 +15,6 @@ interface HealthCheckResponse {
 app.use(morgan("combined"));
 
 app.use(express.json());
-
-// respond to GET request at endpoint "/" with message
-app.get("/", (req, res) => {
-    res.send("Hello World");
-});
 
 /**
  * Health check endpoint that returns server status information
