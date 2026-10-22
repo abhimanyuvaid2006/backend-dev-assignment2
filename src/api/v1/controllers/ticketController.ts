@@ -95,7 +95,6 @@ export const createTicket = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Basic validation - check for required fields
     if (!req.body.title) {
       res.status(HTTP_STATUS.BAD_REQUEST).json({
         message: "Missing required field: title",
@@ -135,10 +134,8 @@ export const updateTicket = async (
   try {
     const id: string = req.params.id as string;
 
-    // Extract update fields
     const { title, description, priority, status } = req.body;
 
-    // A field is ok if it was not sent or if it has an allowed value
     const priorityIsOk: boolean = !priority || isValidPriority(priority);
     const statusIsOk: boolean = !status || isValidStatus(status);
 

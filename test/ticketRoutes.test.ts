@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS } from "../src/constants/httpConstants";
 import * as ticketController from "../src/api/v1/controllers/ticketController";
 import * as ticketService from "../src/api/v1/services/ticketService";
-import type { Ticket } from "../src/api/v1/models/ticketModel";
+import type { Ticket, TicketUrgency } from "../src/api/v1/models/ticketModel";
 
 jest.mock("../src/api/v1/services/ticketService");
 
@@ -23,7 +23,6 @@ describe("Ticket Controller", () => {
 
   describe("getAllTickets", () => {
     it("should handle successful operation", async () => {
-      // Arrange
       const mockTickets: Ticket[] = [
         {
           id: 1,
@@ -36,14 +35,12 @@ describe("Ticket Controller", () => {
       ];
       (ticketService.getAllTickets as jest.Mock).mockReturnValue(mockTickets);
 
-      // Act
       await ticketController.getAllTickets(
         mockReq as Request,
         mockRes as Response,
         mockNext
       );
 
-      // Assert
       expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
       expect(mockRes.json).toHaveBeenCalledWith({
         message: "Tickets retrieved",
@@ -55,7 +52,6 @@ describe("Ticket Controller", () => {
 
   describe("getTicketById", () => {
     it("should handle successful operation", async () => {
-      // Arrange
       const mockTicket: Ticket = {
         id: 1,
         title: "Test Ticket",
@@ -67,13 +63,11 @@ describe("Ticket Controller", () => {
       mockReq.params = { id: "1" };
       (ticketService.getTicketById as jest.Mock).mockReturnValue(mockTicket);
 
-      // Act
       await ticketController.getTicketById(
         mockReq as Request,
         mockRes as Response
       );
 
-      // Assert
       expect(ticketService.getTicketById).toHaveBeenCalledWith("1");
       expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
       expect(mockRes.json).toHaveBeenCalledWith({
@@ -83,9 +77,39 @@ describe("Ticket Controller", () => {
     });
   });
 
+  describe("getTicketUrgency", () => {
+    it("should handle successful operation", async () => {
+      const mockUrgency: TicketUrgency = {
+        id: 1,
+        title: "Test Ticket",
+        priority: "low",
+        status: "open",
+        createdAt: new Date(),
+        ticketAge: 3,
+        urgencyScore: 25,
+        urgencyLevel: "Low urgency. Address when capacity allows.",
+      };
+      mockReq.params = { id: "1" };
+      (ticketService.getTicketUrgency as jest.Mock).mockReturnValue(
+        mockUrgency
+      );
+
+      await ticketController.getTicketUrgency(
+        mockReq as Request,
+        mockRes as Response
+      );
+
+      expect(ticketService.getTicketUrgency).toHaveBeenCalledWith("1");
+      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: "Ticket urgency calculated",
+        data: mockUrgency,
+      });
+    });
+  });
+
   describe("createTicket", () => {
     it("should handle successful creation", async () => {
-      // Arrange
       const mockTicket: {
         title: string;
         description: string;
@@ -105,14 +129,12 @@ describe("Ticket Controller", () => {
       mockReq.body = mockTicket;
       (ticketService.createTicket as jest.Mock).mockReturnValue(createdTicket);
 
-      // Act
       await ticketController.createTicket(
         mockReq as Request,
         mockRes as Response,
         mockNext
       );
 
-      // Assert
       expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.CREATED);
       expect(mockRes.json).toHaveBeenCalledWith({
         message: "Ticket created",
@@ -121,17 +143,14 @@ describe("Ticket Controller", () => {
     });
 
     it("should return 400 when title is missing", async () => {
-      // Arrange
       mockReq.body = { description: "Test Description", priority: "low" };
 
-      // Act
       await ticketController.createTicket(
         mockReq as Request,
         mockRes as Response,
         mockNext
       );
 
-      // Assert
       expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
       expect(mockRes.json).toHaveBeenCalledWith({
         message: "Missing required field: title",
@@ -141,7 +160,6 @@ describe("Ticket Controller", () => {
 
   describe("updateTicket", () => {
     it("should handle successful update", async () => {
-      // Arrange
       const updatedTicket: Ticket = {
         id: 1,
         title: "Test Ticket",
@@ -154,13 +172,11 @@ describe("Ticket Controller", () => {
       mockReq.body = { status: "resolved" };
       (ticketService.updateTicket as jest.Mock).mockReturnValue(updatedTicket);
 
-      // Act
       await ticketController.updateTicket(
         mockReq as Request,
         mockRes as Response
       );
 
-      // Assert
       expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
       expect(mockRes.json).toHaveBeenCalledWith({
         message: "Ticket updated",
@@ -169,17 +185,14 @@ describe("Ticket Controller", () => {
     });
 
     it("should return 400 when priority is invalid", async () => {
-      // Arrange
       mockReq.params = { id: "1" };
       mockReq.body = { priority: "urgent" };
 
-      // Act
       await ticketController.updateTicket(
         mockReq as Request,
         mockRes as Response
       );
 
-      // Assert
       expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
       expect(mockRes.json).toHaveBeenCalledWith({
         message: "Invalid priority. Must be one of: critical, high, medium, low",
@@ -189,16 +202,13 @@ describe("Ticket Controller", () => {
 
   describe("deleteTicket", () => {
     it("should handle successful deletion", async () => {
-      // Arrange
       mockReq.params = { id: "1" };
 
-      // Act
       await ticketController.deleteTicket(
         mockReq as Request,
         mockRes as Response
       );
 
-      // Assert
       expect(ticketService.deleteTicket).toHaveBeenCalledWith("1");
       expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
       expect(mockRes.json).toHaveBeenCalledWith({

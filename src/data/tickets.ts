@@ -6,10 +6,8 @@ import { Ticket } from "../api/v1/models/ticketModel";
  * @returns Date that many days before right now
  */
 const daysAgo = (days: number): Date => {
-  // number of milliseconds in one day
   const millisecondsPerDay: number = 24 * 60 * 60 * 1000;
 
-  // Date.now() is right now, so subtract the days we want to go back
   return new Date(Date.now() - days * millisecondsPerDay);
 };
 

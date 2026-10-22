@@ -56,12 +56,10 @@ const getUrgencyLevel = (urgencyScore: number): string => {
  * @returns The ticket age in days, the urgency score and the urgency level
  */
 export const calculateUrgency = (ticket: Ticket): UrgencyResult => {
-  // work out how many whole days old the ticket is
   const millisecondsPerDay: number = 24 * 60 * 60 * 1000;
   const ageInMilliseconds: number = Date.now() - ticket.createdAt.getTime();
   const ticketAge: number = Math.floor(ageInMilliseconds / millisecondsPerDay);
 
-  // A resolved ticket gets a score of 0 (from the video)
   if (ticket.status === "resolved") {
     return {
       ticketAge: ticketAge,
@@ -86,7 +84,6 @@ export const calculateUrgency = (ticket: Ticket): UrgencyResult => {
  * @returns Array of all tickets
  */
 export const getAllTickets = async (): Promise<Ticket[]> => {
-  // Return a deep clone to avoid direct mutation
   return structuredClone(tickets);
 };
 
@@ -148,7 +145,6 @@ export const createTicket = async (ticketData: {
   description: string;
   priority: string;
 }): Promise<Ticket> => {
-  // Create a new ticket with auto-generated ID
   const newTicket: Ticket = {
     id: Date.now(),
     title: ticketData.title,
@@ -188,7 +184,6 @@ export const updateTicket = async (
 
   const existing: Ticket = tickets[index];
 
-  // Only overwrite the fields that were actually provided
   tickets[index] = {
     ...existing,
     title: ticketData.title || existing.title,
