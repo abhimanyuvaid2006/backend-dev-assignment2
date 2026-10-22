@@ -4,6 +4,7 @@ import * as ticketController from "../controllers/ticketController";
 const router: Router = express.Router();
 
 router.get("/", ticketController.getAllTickets);
+router.get("/:id/urgency", ticketController.getTicketUrgency);
 router.get("/:id", ticketController.getTicketById);
 router.post("/", ticketController.createTicket);
 router.put("/:id", ticketController.updateTicket);

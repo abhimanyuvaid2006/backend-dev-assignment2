@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { HTTP_STATUS } from "../../../constants/httpConstants";
 import * as ticketService from "../services/ticketService";
-import type { Ticket } from "../models/ticketModel";
+import type { Ticket, TicketUrgency } from "../models/ticketModel";
 
 /**
  * Checks if a priority is one of the allowed values
@@ -70,6 +70,25 @@ export const getTicketById = async (
   }
 };
 
+export const getTicketUrgency = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const id: string = req.params.id as string;
+    const urgency: TicketUrgency = await ticketService.getTicketUrgency(id);
+    res.status(HTTP_STATUS.OK).json({
+      message: "Ticket urgency calculated",
+      data: urgency,
+    });
+  } catch (error) {
+    console.error("Error calculating ticket urgency:", error);
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+      message: "Ticket not found",
+    });
+  }
+};
+
 export const createTicket = async (
   req: Request,
   res: Response,
@@ -90,7 +109,6 @@ export const createTicket = async (
         message: "Invalid priority. Must be one of: critical, high, medium, low",
       });
     } else {
-      // Extract only the fields we need
       const { title, description, priority } = req.body;
 
       const ticketData: {
@@ -133,7 +151,6 @@ export const updateTicket = async (
         message: "Invalid status. Must be one of: open, in-progress, resolved",
       });
     } else {
-      // Create update data object with only the fields that can be updated
       const updateData: {
         title?: string;
         description?: string;
